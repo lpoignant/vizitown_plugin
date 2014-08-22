@@ -20,6 +20,7 @@
  ***************************************************************************/
 """
 import re
+import uuid
 
 from qgis.core import *
 
@@ -32,24 +33,32 @@ class Layer:
     #  @param QgsMapLayer the layer managed
     def __init__(self, QgsMapLayer):
         self.qgisLayer = QgsMapLayer
-        source = self.parse_vector(QgsMapLayer.source())
+        self._layerType = QgsMapLayer.storageType()
+        self._isShape = False
 
-        self._host = source['host']
-        self._dbname = source['dbname']
-        self._port = source['port']
-        self._user = source['user']
-        self._password = source['password']
-        self._table = source['table']
-        self._column = source['column']
+        if self._layerType == "ESRI Shapefile":
+            self._isShape = True
+
+        if not self._isShape:
+            source = self.parse_vector(QgsMapLayer.source())
+
+            self._host = source['host']
+            self._dbname = source['dbname']
+            self._port = source['port']
+            self._user = source['user']
+            self._password = source['password']
+            self._table = source['table']
+            self._column = source['column']
 
         self._srid = QgsMapLayer.crs().postgisSrid()
         self._column2 = None
         self._typeColumn2 = None
 
-        self._displayName = QgsMapLayer.name() + ' ' + self._column
+        self._displayName = QgsMapLayer.name()# + ' ' + self._column
 
         # single id for a layer
-        self._uuid = re.sub("\"", "", str(self._dbname + self._table + self._column))
+        # self._uuid = re.sub("\"", "", str(self._dbname + self._table + self._column))
+        self._uuid = QgsMapLayer.name()
 
         # if self._colorType is singleSymbol equal None
         # else is field in database to sort data

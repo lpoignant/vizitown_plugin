@@ -28,6 +28,7 @@ from vt_utils_tiler import VTTiler, Extent
 from vt_as_provider_manager import ProviderManager
 from vt_utils_parameters import Parameters
 from vt_as_provider_postgis import PostgisProvider
+from vt_as_provider_shapefile import ShapefileProvider
 from vt_as_provider_raster import RasterProvider
 
 
@@ -46,7 +47,10 @@ class ProviderFactory():
     def create_vector_providers(self, arrayLayer):
         for layer in arrayLayer:
             layer.update_color()
-            provider = PostgisProvider(layer)
+            if  layer._isShape:
+                provider = ShapefileProvider(layer)
+            else:
+                provider = PostgisProvider(layer)
             self.providerManager.add_vector_provider(provider)
 
     ## create_raster_providers method

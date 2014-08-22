@@ -19,12 +19,15 @@
  *                                                                         *
  ***************************************************************************/
 """
+import sys
 import os
 import json
 from multiprocessing import Queue
 
-import cyclone.websocket
-import cyclone.escape
+sys.path.insert(0, os.path.dirname(__file__))
+from cyclone.websocket import WebSocketHandler
+from cyclone.web import StaticFileHandler, RequestHandler
+sys.path.pop(0)
 
 from vt_utils_converter import PostgisToJSON
 from vt_as_provider_manager import ProviderManager
@@ -36,7 +39,7 @@ from vt_utils_parameters import Parameters
 ## Class CorsStaticFileHandler
 #  A static file handler which authorize cross origin
 #  Unherited cyclone.web.StaticFileHandler
-class CorsStaticFileHandler(cyclone.web.StaticFileHandler):
+class CorsStaticFileHandler(StaticFileHandler):
 
     ## set_default_headers method
     #  Define the headers for the default handler
@@ -50,7 +53,7 @@ class CorsStaticFileHandler(cyclone.web.StaticFileHandler):
 ## Class InitHandler
 #  A handler give initial parameters to the browser
 #  Unherited cyclone.web.RequestHandler
-class InitHandler(cyclone.web.RequestHandler):
+class InitHandler(RequestHandler):
 
     ## initialize method
     #  Initialize the handler for the init parameter
@@ -77,22 +80,14 @@ class InitHandler(cyclone.web.RequestHandler):
 #  Use to handle the transmission of the data
 #  retreived from postgis to the web browser
 #  Unherited cyclone.websocket.WebSocketHandler
-class DataHandler(cyclone.web.RequestHandler):
+class DataHandler(WebSocketHandler):
 
-    ## initialize method
-    #  Initialize the handler for the init parameter
-    #  @override cyclone.web.RequestHandler
-    def initialize(self):
-        self.parameters = Parameters.instance()
+    ## connectionMade method
+    #  Method call when the websocket is opened
+    #  @override cyclone.websocket.WebSocketHandler
+    def connectionMade(self):
+        print "WebSocket data opened"
         self.translator = PostgisToJSON()
-
-    ## set_default_headers method
-    #  Define the headers for the default handler
-    #  @override cyclone.web.RequestHandler
-    def set_default_headers(self):
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
 
     ## messageReceived method
     #  Method call when a message is received
@@ -101,25 +96,40 @@ class DataHandler(cyclone.web.RequestHandler):
     #   '{"Xmin": 0, "Ymin": 0, "Xmax": 50, "Ymax": 50}' for request all vectors
     #   '{"Xmin": 0, "Ymin": 0, "Xmax": 50, "Ymax": 50, uuid: "my_uuid"}' for a request only a specific vector
     #  @override cyclone.websocket.WebSocketHandler
-    def post(self ):
-        d = json.loads(self.request.body)
-        print "ask for tile", d
+    def messageReceived(self, message):
+        # Keep alive connection
+        if message == "ping":
+            self.sendMessage("pong")
+            return
+
+        d = json.loads(message)
+
         vectors = ProviderManager.instance().request_tile(**d)
+        print "request tile"
+        return
         if not vectors:
-            self.write("{}")
+            self.sendMessage("{}")
             return
 
         for v in vectors:
             for i in range(len(v['results'])):
                 if v['results'][i]:
                     json_ = self.translator.parse(v['results'][i], v['geom'], v['hasH'], v['color'][i], v['uuid'])
-                    self.write(json_)
+                    self.sendMessage(json_)
+
+    ## connectionLost method
+    #  Method call when the websocket is closed
+    #  @param reason to indicate the reason of the closed instance
+    #  @override cyclone.websocket.WebSocketHandler
+    def connectionLost(self, reason):
+        print "WebSocket data closed"
+
 
 ## Synchronisation Handler
 #  Use to handle the synchronisation of the view
 #  from QGIS to the web browser
 #  Unherited cyclone.websocket.WebSocketHandler
-class SyncHandler(cyclone.websocket.WebSocketHandler):
+class SyncHandler(WebSocketHandler):
 
     ## initialize method
     #  Method to initialize the handler
@@ -163,7 +173,7 @@ class SyncHandler(cyclone.websocket.WebSocketHandler):
 #  Use to give the information related to the tiles generated
 #  when the GDAL tiling is finished
 #  Unherited cyclone.websocket.WebSocketHandler
-class TilesInfoHandler(cyclone.websocket.WebSocketHandler):
+class TilesInfoHandler(WebSocketHandler):
 
     ## initialize method
     #  Method to initialize the handler
@@ -182,7 +192,6 @@ class TilesInfoHandler(cyclone.websocket.WebSocketHandler):
             self.result.set_result(self.parameters.GDALqueue.get())
             self.parameters.GDALqueue.close()
             self.parameters.GDALprocess.terminate()
-            
 
         if self.parameters.GDALprocess and self.parameters.GDALprocess.is_alive():
             print "Wait GDAL tiling ..."

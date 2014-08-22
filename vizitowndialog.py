@@ -34,6 +34,7 @@ from vt_as_app import AppServer
 from vt_as_sync import SyncManager
 from vt_as_provider_manager import ProviderManager
 from vt_as_provider_postgis import PostgisProvider
+from vt_as_provider_shapefile import ShapefileProvider
 from vt_utils_layer import Layer
 from vt_utils_provider_factory import ProviderFactory
 from vt_utils_parameters import Parameters
@@ -105,7 +106,10 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
 
             if is_vector(qgisLayer):
                 vLayer = Layer(qgisLayer)
-                columnInfoLayer = PostgisProvider.get_columns_info_table(vLayer)
+                if vLayer._isShape:
+                    columnInfoLayer = ShapefileProvider.get_columns_info_table(vLayer)
+                else:
+                    columnInfoLayer = PostgisProvider.get_columns_info_table(vLayer)
                 item = QtGui.QTableWidgetItem(vLayer._displayName)
                 item.setData(QtCore.Qt.UserRole, vLayer)
                 item.setFlags(QtCore.Qt.ItemIsEnabled)
