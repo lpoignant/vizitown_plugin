@@ -52,4 +52,4 @@ def is_texture(layer):
 #  @param layer
 #  @return True if the layer is a Vector which come from a database
 def is_vector(layer):
-    return layer.type() == QgsMapLayer.VectorLayer and layer.source().startswith('dbname')
+    return layer.type() == QgsMapLayer.VectorLayer
