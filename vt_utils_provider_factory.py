@@ -24,9 +24,10 @@ import sys
 import shutil
 import multiprocessing as mp
 
+import core
+
 from vt_utils_tiler import VTTiler, Extent
 from vt_as_provider_manager import ProviderManager
-from vt_utils_parameters import Parameters
 from vt_as_provider_postgis import PostgisProvider
 from vt_as_provider_raster import RasterProvider
 
@@ -38,7 +39,7 @@ class ProviderFactory():
     ## Constructor
     def __init__(self):
         self.providerManager = ProviderManager.instance()
-        self.parameters = Parameters.instance()
+        self.scene = core.Scene.instance()
 
     ## create_vector_providers method
     #  Create all providers with the selected layers in the GUI
@@ -56,20 +57,20 @@ class ProviderFactory():
     def create_raster_providers(self, dem, texture):
         dataSrcImg = None
         dataSrcMnt = None
-        extent = self.parameters.extent
+        extent = self.scene.extent
         originExtent = Extent(extent[0], extent[1], extent[2], extent[3])
-        tileSize = self.parameters.tileSize
-        zoomLevel = self.parameters.zoomLevel
-        path = self.parameters.rastersPath
+        tileSize = self.scene.tileSize
+        zoomLevel = self.scene.zoomLevel
+        path = self.scene.rastersPath
         if dem is not None:
             demProvider = RasterProvider(dem)
             dataSrcMnt = demProvider.source
-            self.parameters.set_resources_dem(demProvider.httpResource)
+            self.scene.set_resources_dem(demProvider.httpResource)
             self.providerManager.dem = demProvider
         if texture is not None:
             textureProvider = RasterProvider(texture)
             dataSrcImg = textureProvider.source
-            self.parameters.set_resources_texture(textureProvider.httpResource)
+            self.scene.set_resources_texture(textureProvider.httpResource)
             self.providerManager.texture = textureProvider
 
         if os.name == 'nt':
@@ -79,8 +80,8 @@ class ProviderFactory():
 
         self.clear_rasters_directory(self.parameters.rastersPath)
         tiler = VTTiler(originExtent, tileSize, zoomLevel, dataSrcMnt, dataSrcImg)
-        self.parameters.GDALprocess = mp.Process(target=tiler.create, args=(path, self.parameters.GDALqueue))
-        self.parameters.GDALprocess.start()
+        self.scene.GDALprocess = mp.Process(target=tiler.create, args=(path, self.parameters.GDALqueue))
+        self.scene.GDALprocess.start()
 
     ## clear_rasters_directory method
     #  Clean the rasters directory where the tile of data image are created

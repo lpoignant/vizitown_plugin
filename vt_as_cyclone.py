@@ -27,9 +27,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 from cyclone.bottle import run, route, unrun
 sys.path.pop(0)
 
+import core
+
 from vt_test_handlers import PingHandler, EchoHandler
 from vt_as_handlers import *
-from vt_utils_parameters import Parameters
 
 
 ## CycloneThread
@@ -46,26 +47,26 @@ class CycloneThread(QThread):
     def __init__(self, parentObject, debug=True):
         QThread.__init__(self, parentObject.thread())
         self.debug = debug
-        self.parameters = Parameters.instance()
+        self.scene = core.Scene.instance()
 
     ## run method
     #  Launch the cyclone server and create the handler
     #  @override QThread
     def run(self):
         handlers = [
-            (r'/app/(.*)', CorsStaticFileHandler, {"path": self.parameters.viewerPath}),
+            (r'/app/(.*)', CorsStaticFileHandler, {"path": self.scene.viewerPath}),
             (r'/init', InitHandler),
             (r'/data', DataHandler),
             (r'/sync', SyncHandler),
-            (r'/rasters/(.*)', CorsStaticFileHandler, {"path": self.parameters.rastersPath}),
+            (r'/rasters/(.*)', CorsStaticFileHandler, {"path": self.scene.rastersPath}),
         ]
 
-        if self.parameters.get_viewer_param()['hasRaster']:
+        if self.scene.get_viewer_param()['hasRaster']:
             handlers.append((r'/tiles_info', TilesInfoHandler))
         if self.debug:
             handlers.append((r'/test/echo', EchoHandler))
             handlers.append((r'/test/ping', PingHandler))
-        run(host="127.0.0.1", port=self.parameters.port, more_handlers=handlers)
+        run(host="127.0.0.1", port=self.scene.port, more_handlers=handlers)
 
     ## stop method
     #  Stop the cyclone server

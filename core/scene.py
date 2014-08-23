@@ -1,4 +1,5 @@
 import os
+import sys
 
 from multiprocessing import Queue
 
@@ -10,8 +11,9 @@ class Scene:
 
     ## Constructor
     def __init__(self):
-        self.rastersPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "rasters")
-        self.viewerPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "vt_viewer")
+        self.rastersPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../rasters")
+        self.viewerPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../vt_viewer")
+        
         self.GDALqueue = Queue()
         self.dem = None
         self.texture = None
@@ -61,10 +63,10 @@ class Scene:
     #  @param arrayVectors the array of vectors
     def set_all_vectors(self, arrayVectors):
         array = []
-        for vectorp in arrayVectors:
-            self.providerManager.add_vector_provider(vectorp)
-            array.append(vectorp._vector._uuid)
-        self.all_vectors = array
+        #for vectorp in arrayVectors:
+        #    self.providerManager.add_vector_provider(vectorp)
+        #    array.append(vectorp._vector._uuid)
+        self.all_vectors = arrayVectors
 
     ## set_tiling_param method
     #  Define the parameters of the tiles

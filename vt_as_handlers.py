@@ -29,12 +29,12 @@ from cyclone.websocket import WebSocketHandler
 from cyclone.web import StaticFileHandler, RequestHandler
 sys.path.pop(0)
 
+import core
+
 from vt_utils_converter import PostgisToJSON
 from vt_as_provider_manager import ProviderManager
 from vt_as_sync import SyncManager
 from vt_utils_result_vttiler import ResultVTTiler
-from vt_utils_parameters import Parameters
-
 
 ## Class CorsStaticFileHandler
 #  A static file handler which authorize cross origin
@@ -59,7 +59,7 @@ class InitHandler(RequestHandler):
     #  Initialize the handler for the init parameter
     #  @override cyclone.web.RequestHandler
     def initialize(self):
-        self.parameters = Parameters.instance()
+        self.scene = core.Scene.instance()
 
     ## set_default_headers method
     #  Define the headers for the default handler
@@ -73,7 +73,7 @@ class InitHandler(RequestHandler):
     #  Handle GET HTTP
     #  @override cyclone.web.RequestHandler
     def get(self):
-        self.write(json.dumps(self.parameters.get_viewer_param(), separators=(',', ':')))
+        self.write(json.dumps(self.scene.get_viewer_param(), separators=(',', ':')))
 
 
 ## Class Data Handler
@@ -97,6 +97,10 @@ class DataHandler(WebSocketHandler):
     #   '{"Xmin": 0, "Ymin": 0, "Xmax": 50, "Ymax": 50, uuid: "my_uuid"}' for a request only a specific vector
     #  @override cyclone.websocket.WebSocketHandler
     def messageReceived(self, message):
+        print "Send tile"
+        return
+        # STUB
+
         # Keep alive connection
         if message == "ping":
             self.sendMessage("pong")
@@ -176,7 +180,7 @@ class TilesInfoHandler(WebSocketHandler):
     #  Method to initialize the handler
     #  @override cyclone.websocket.WebSocketHandler
     def initialize(self):
-        self.parameters = Parameters.instance()
+        self.scene = core.Scene.instance()
         self.result = ResultVTTiler.instance()
 
     ## connectionMade method
@@ -186,16 +190,16 @@ class TilesInfoHandler(WebSocketHandler):
         print "WebSocket tiles_info opened"
 
         if not self.result.is_define():
-            self.result.set_result(self.parameters.GDALqueue.get())
-            self.parameters.GDALqueue.close()
-            self.parameters.GDALprocess.terminate()
+            self.result.set_result(self.scene.GDALqueue.get())
+            self.scene.GDALqueue.close()
+            self.scene.GDALprocess.terminate()
 
-        if self.parameters.GDALprocess and self.parameters.GDALprocess.is_alive():
+        if self.scene.GDALprocess and self.scene.GDALprocess.is_alive():
             print "Wait GDAL tiling ..."
-            self.parameters.GDALprocess.join()
+            self.scene.GDALprocess.join()
             print "Send tiles info ..."
 
-        tilesInfo = self.parameters.get_tiling_param()
+        tilesInfo = self.scene.get_tiling_param()
         # Add pixel Size in JSON and Min/Max height if have dem
         if self.result.is_define():
             tilesInfo['pixelSize'] = self.result.pixelSize

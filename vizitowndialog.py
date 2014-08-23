@@ -30,13 +30,14 @@ from PyQt4 import QtCore, QtGui
 from qgis.core import *
 from qgis.gui import *
 
+import core
+
 from vt_as_app import AppServer
 from vt_as_sync import SyncManager
 from vt_as_provider_manager import ProviderManager
 from vt_as_provider_postgis import PostgisProvider
 from vt_utils_layer import Layer
 from vt_utils_provider_factory import ProviderFactory
-from vt_utils_parameters import Parameters
 
 from vt_utils_gui import *
 
@@ -57,7 +58,7 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
         self.GDALprocess = None
         self.zoomLevel = "1"
 
-        self.parameters = Parameters.instance()
+        self.scene = core.Scene.instance()
         self.providerManager = ProviderManager.instance()
 
     ## init_extent method
@@ -244,10 +245,10 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
             return
         self.pb_loading.show()
 
-        self.parameters.set_viewer_param(self.get_gui_extent(), self.sb_port.value(), self.has_raster())
-        self.parameters.set_tiling_param(self.zoomLevel, self.get_size_tile())
+        self.scene.set_viewer_param(self.get_gui_extent(), self.sb_port.value(), self.has_raster())
+        self.scene.set_tiling_param(self.zoomLevel, self.get_size_tile())
         self.instantiate_providers()
-        self.parameters.set_all_vectors(self.providerManager.get_all_vectors())
+        self.scene.set_all_vectors(self.providerManager.get_all_vectors())
 
         self.appServer = AppServer(self)
         self.appServer.start()
@@ -295,4 +296,4 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
             self.appServerRunning = False
             SyncManager.instance().remove_all_listener()
             self.providerManager.clear()
-            self.parameters.clear()
+            self.scene.clear()
