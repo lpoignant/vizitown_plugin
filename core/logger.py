@@ -10,7 +10,7 @@ class Logger:
 
     def __init__(self):
         self.logger = logging.getLogger('Vizitown-logger')
-        self.logger.setLevel(logging.WARNING)
+        self.logger.setLevel(logging.DEBUG)
 
         # Define file with entire path 
         loggerPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../vizitown.log")
