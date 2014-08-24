@@ -1,5 +1,7 @@
 from qgis.core import *
 
+from .. import core
+
 
 class Color:
     SINGLE = "singleSymbol"
@@ -46,7 +48,7 @@ class Color:
         if self._type == SINGLE:
             tabColor.append({'color': str(self._renderer.symbol().color().name())})
 
-        else if self._type == GRADUATE:
+        elif self._type == GRADUATE:
             lowerValue = []
             upperValue = []
 
@@ -59,7 +61,7 @@ class Color:
             for i in xrange(size):
                 tabColor.append({'min': lowerValue[i], 'max': upperValue[i], 'color': color[i]})
 
-        else if self._type == CATEGORIZED:
+        elif self._type == CATEGORIZED:
             value = []
 
             for symbol in self._renderer.symbols():
@@ -71,6 +73,7 @@ class Color:
                 tabColor.append({'value': value[i], 'color': color[i]})
 
         else:
-            raise ValueError, "Symbol type unhandled"
+            self.logger.warning("Symbol type unhandled")
+            #raise ValueError, "Symbol type unhandled"
 
         self._colors = tabColor

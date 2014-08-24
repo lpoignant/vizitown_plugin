@@ -7,6 +7,9 @@ class Vector:
         self._qgisLayer = QgsMapLayer
         # self._provider = Provider
 
+        self._column2_name = None
+        self._column2_type = None
+
         self._displayName = QgsMapLayer.name()
         # Have to be improve
         self._uuid = self._displayName

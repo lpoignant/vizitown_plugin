@@ -3,6 +3,8 @@ import sys
 
 from multiprocessing import Queue
 
+from logger import Logger
+
 from singleton import Singleton
 from provider_manager import ProviderManager
 
@@ -13,7 +15,7 @@ class Scene:
     def __init__(self):
         self.rastersPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../rasters")
         self.viewerPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../vt_viewer")
-        
+
         self.GDALqueue = Queue()
         self.dem = None
         self.texture = None
@@ -61,12 +63,14 @@ class Scene:
     ## set_all_vectors method
     #  Define t
     #  @param arrayVectors the array of vectors
-    def set_all_vectors(self, arrayVectors):
+    def set_all_vectors(self, arrayProviders):
         array = []
-        #for vectorp in arrayVectors:
-        #    self.providerManager.add_vector_provider(vectorp)
-        #    array.append(vectorp._vector._uuid)
-        self.all_vectors = arrayVectors
+        for vectorp in arrayProviders:
+            self.providerManager.add_vector_provider(vectorp)
+            name = vectorp._vector._displayName
+            uuid = vectorp._vector._uuid
+            array.append({'uuid':uuid, 'name':name})
+        self.all_vectors = array
 
     ## set_tiling_param method
     #  Define the parameters of the tiles

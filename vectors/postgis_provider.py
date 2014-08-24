@@ -1,13 +1,16 @@
 import re
-from vector_provider import VectorProvider
 
 from PyQt4.QtSql import *
 
+from .. import core
+
+from vector_provider import VectorProvider
 
 class PostgisProvider(VectorProvider):
 
     def __init__(self, vector):
         VectorProvider.__init__(self, vector)
+        self.logger = core.Logger.instance()
 
         self._dbname    = None
         self._host      = None
@@ -76,10 +79,15 @@ class PostgisProvider(VectorProvider):
         self._db.setPort(self._port)
         self._db.setUserName(self._user)
         self._db.setPassword(self._password)
+        core.Logger.instance().info("Database define")
 
-    def __open_connection(self):
+    def _open_connection(self):
         if not self._db.open():
+            self.logger.error("Connection to database cannot be established")
             raise Exception('Connection to database cannot be established')
+        self.logger.info("Connection to db established")
 
-    def __close_connection(self):
+
+    def _close_connection(self):
         self._db.close()
+        core.Logger.instance().info("Connection to db closed")

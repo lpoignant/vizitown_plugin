@@ -1,7 +1,10 @@
 import re
-from vector_provider import VectorProvider
 
 from PyQt4.QtSql import *
+
+import core
+
+from vector_provider import VectorProvider
 
 
 class ShapefileProvider(VectorProvider):

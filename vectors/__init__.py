@@ -1,4 +1,4 @@
-from vector_factory import VectorFactory
+from factory_vector_provider import VectorProviderFactory
 
 from vector_provider import VectorProvider
 
@@ -7,5 +7,3 @@ from postgis_provider import PostgisProvider
 
 from vector import Vector
 from color import Color
-
-print "Import Vectors Package"

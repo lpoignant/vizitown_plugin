@@ -31,12 +31,11 @@ from qgis.core import *
 from qgis.gui import *
 
 import core
+import vectors
 
 from vt_as_app import AppServer
 from vt_as_sync import SyncManager
 from vt_as_provider_manager import ProviderManager
-from vt_as_provider_postgis import PostgisProvider
-from vt_utils_layer import Layer
 from vt_utils_provider_factory import ProviderFactory
 
 
@@ -99,15 +98,17 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
     def init_layers(self):
         self.reset_all_fields()
         layerListIems = QgsMapLayerRegistry().instance().mapLayers().items()
+        factory = vectors.VectorProviderFactory()
         for id, qgisLayer in layerListIems:
             if self.is_dem(qgisLayer):
                 self.cb_dem.addItem(qgisLayer.name(), qgisLayer)
 
             if self.is_vector(qgisLayer):
-                vLayer = Layer(qgisLayer)
-                columnInfoLayer = PostgisProvider.get_columns_info_table(vLayer)
-                item = QtGui.QTableWidgetItem(vLayer._displayName)
-                item.setData(QtCore.Qt.UserRole, vLayer)
+                pvector = factory.create_provider(qgisLayer)
+
+                columnInfoLayer = pvector.get_columns_info()
+                item = QtGui.QTableWidgetItem(pvector._vector._displayName)
+                item.setData(QtCore.Qt.UserRole, pvector)
                 item.setFlags(QtCore.Qt.ItemIsEnabled)
                 self.add_vector_layer(item, columnInfoLayer)
 
@@ -236,21 +237,22 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
             return [float(xmin), float(ymin), float(xmax), float(ymax)]
         return [float(self.extent.xMinimum()), float(self.extent.yMinimum()), float(self.extent.xMaximum()), float(self.extent.yMaximum())]
 
-    ## get_selected_layers method
+    ## set_selected_layers method
     #  Get all layers checked in the GUI and the associated informations
-    #  @return the list of selected layers
-    def get_selected_layers(self):
+    #  @return the list of selected layers (layer is manipulate using his provider)
+    def set_selected_vector_layers(self):
         selectedLayers = []
         for row_index in range(self.tw_layers.rowCount()):
             # if the layer is checked
             if self.tw_layers.item(row_index, 0).checkState() == QtCore.Qt.Checked:
-                layer = self.tw_layers.item(row_index, 1).data(QtCore.Qt.UserRole)
+                provider = self.tw_layers.item(row_index, 1).data(QtCore.Qt.UserRole)
                 column2 = self.tw_layers.cellWidget(row_index, 2).currentText()
                 if column2 != "None":
                     split = column2.split(" - ")
-                    layer._column2 = split[0]
-                    layer._typeColumn2 = split[1]
-                selectedLayers.append(layer)
+                    cname = split[0]
+                    ctype = split[1]
+                    provider.add_column2(cname, ctype)
+                selectedLayers.append(provider)
         return selectedLayers
 
     ## on_btn_default_released method
@@ -278,7 +280,7 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
         self.scene.set_viewer_param(self.get_gui_extent(), self.sb_port.value(), self.has_raster())
         self.scene.set_tiling_param(self.zoomLevel, self.get_size_tile())
         self.instantiate_providers()
-        self.scene.set_all_vectors(self.providerManager.get_all_vectors())
+        self.scene.set_all_vectors(self.set_selected_vector_layers())
 
         self.appServer = AppServer(self)
         self.appServer.start()
@@ -294,7 +296,6 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
     #  Create providers in function of the existed data
     def instantiate_providers(self):
         factory = ProviderFactory()
-        factory.create_vector_providers(self.get_selected_layers())
         dem = None
         texture = None
         if self.has_raster():

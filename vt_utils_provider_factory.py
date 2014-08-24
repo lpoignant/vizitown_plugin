@@ -28,7 +28,6 @@ import core
 
 from vt_utils_tiler import VTTiler, Extent
 from vt_as_provider_manager import ProviderManager
-from vt_as_provider_postgis import PostgisProvider
 from vt_as_provider_raster import RasterProvider
 
 
@@ -40,15 +39,6 @@ class ProviderFactory():
     def __init__(self):
         self.providerManager = ProviderManager.instance()
         self.scene = core.Scene.instance()
-
-    ## create_vector_providers method
-    #  Create all providers with the selected layers in the GUI
-    #  @param arrayLayer list of hte selected layers
-    def create_vector_providers(self, arrayLayer):
-        for layer in arrayLayer:
-            layer.update_color()
-            provider = PostgisProvider(layer)
-            self.providerManager.add_vector_provider(provider)
 
     ## create_raster_providers method
     #  Create all providers for DEM and raster
