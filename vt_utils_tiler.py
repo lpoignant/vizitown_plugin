@@ -31,6 +31,8 @@ from multiprocessing import Queue
 import os
 import sys
 
+import core
+
 
 ## Class Extent
 #  Manage the extent
@@ -240,8 +242,7 @@ class Raster(object):
 
         fileName = os.path.splitext(os.path.basename(self.path))[0] + "_" + str(tileSize) + "_" + str(zoom)
         destPath = os.path.join(baseDestPath, fileName)
-        print "Destination folder:"
-        print destPath
+        core.Logger.instance().info("Destination folder : " + destPath)
         if not os.path.isdir(destPath):
             os.makedirs(destPath)
 
@@ -259,7 +260,7 @@ class Raster(object):
                 while tileMinX < maxX:
                     tileMaxX = tileMinX + size
                     outFilename = self.rasterName(destPath, zoom, x, y)
-                    print outFilename
+                    core.Logger.instance().info("Create tile : " + outFilename)
                     self.createForExtent(Extent(tileMinX, tileMinY, tileMaxX, tileMaxY), outFilename)
                     #Next x tile
                     x += 1
@@ -325,6 +326,7 @@ class VTTiler(object):
 
             queue.put([self.ROrtho.pixelSizeX()])
 
+        core.Logger.instance().info("GDAL Tiling is over.")
         # Close log files
         sys.stderr.close()
         sys.stdout.close()
