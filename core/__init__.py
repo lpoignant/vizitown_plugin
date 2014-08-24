@@ -2,3 +2,4 @@
 from scene import Scene
 from tile import Tile
 from provider_manager import ProviderManager
+from logger import Logger
