@@ -78,9 +78,9 @@ class ProviderFactory():
             mp.set_executable(pythonPath)
             sys.argv = [None]
 
-        self.clear_rasters_directory(self.parameters.rastersPath)
+        self.clear_rasters_directory(self.scene.rastersPath)
         tiler = VTTiler(originExtent, tileSize, zoomLevel, dataSrcMnt, dataSrcImg)
-        self.scene.GDALprocess = mp.Process(target=tiler.create, args=(path, self.parameters.GDALqueue))
+        self.scene.GDALprocess = mp.Process(target=tiler.create, args=(path, self.scene.GDALqueue))
         self.scene.GDALprocess.start()
 
     ## clear_rasters_directory method
