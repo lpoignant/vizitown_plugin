@@ -39,8 +39,6 @@ from vt_as_provider_postgis import PostgisProvider
 from vt_utils_layer import Layer
 from vt_utils_provider_factory import ProviderFactory
 
-from vt_utils_gui import *
-
 
 ## Class VizitownDialog
 #  Vizitown dialog in QGIS GUI and
@@ -51,6 +49,7 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
     #  @param extent the initial extent
     def __init__(self, extent):
         QtGui.QDialog.__init__(self)
+        core.Logger.instance().info("Launch Vizitown")
         self.setupUi(self)
         self.destroyed.connect(self.closeEvent)
         self.appServer = None
@@ -101,10 +100,10 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
         self.reset_all_fields()
         layerListIems = QgsMapLayerRegistry().instance().mapLayers().items()
         for id, qgisLayer in layerListIems:
-            if is_dem(qgisLayer):
+            if self.is_dem(qgisLayer):
                 self.cb_dem.addItem(qgisLayer.name(), qgisLayer)
 
-            if is_vector(qgisLayer):
+            if self.is_vector(qgisLayer):
                 vLayer = Layer(qgisLayer)
                 columnInfoLayer = PostgisProvider.get_columns_info_table(vLayer)
                 item = QtGui.QTableWidgetItem(vLayer._displayName)
@@ -112,7 +111,7 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
                 item.setFlags(QtCore.Qt.ItemIsEnabled)
                 self.add_vector_layer(item, columnInfoLayer)
 
-            if is_texture(qgisLayer):
+            if self.is_texture(qgisLayer):
                 self.cb_texture.addItem(qgisLayer.name(), qgisLayer)
 
     ## reset_all_fields method
@@ -161,6 +160,37 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
         if self.has_raster() or self.has_vector():
             return True
         return False
+
+    ## is_raster method
+    #  Check if the layer is a Raster which come from a database
+    #  @param layer
+    #  @return True if the layer is a Raster which come from a database
+    def is_raster(self, layer):
+        return layer.type() == QgsMapLayer.RasterLayer and layer.providerType() == "gdal"
+
+
+    ## is_dem method
+    #  Check if the layer is a Data Elevation Model which come from a database
+    #  @param layer
+    #  @return True if the layer is a Data Elevation Model which come from a database
+    def is_dem(self, layer):
+        return self.is_raster(layer) and layer.bandCount() == 1
+
+
+    ## is_texture method
+    #  Check if the layer is a Texture which come from a database
+    #  @param layer
+    #  @return True if the layer is a Texture which come from a database
+    def is_texture(self, layer):
+        return self.is_raster(layer) and layer.bandCount() >= 3
+
+
+    ## is_vector method
+    #  Check if the layer is a Vector which come from a database
+    #  @param layer
+    #  @return True if the layer is a Vector which come from a database
+    def is_vector(self, layer):
+        return layer.type() == QgsMapLayer.VectorLayer
 
     ## add_vector_layer method
     #  Add vector layer in QTableWidget
