@@ -33,11 +33,12 @@ class PostgisProvider(VectorProvider):
     def request_tile(self, tile):
         self._vector.update_color()
         core.Logger.instance().debug("Request Tile Postgis Provider")
-        if not self._vector._has_2_column:
-            VectorProvider.request_tile(self, tile)
-        else:
+
+        if self._vector._column2_is_geom:
+            # If column 2 is a geometry consider is 3D layer
             self.logger.error("NOT IMPLEMENTED YET - TODO")
-        raise NotImplementedError
+        else:
+            VectorProvider.request_tile(self, tile)
 
     ## _parse_source method
     #  Parse QgsMapLayer.source() (String) to save useful data
