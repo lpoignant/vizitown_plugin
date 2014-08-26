@@ -11,8 +11,20 @@
 [general]
 name=ViziTown
 qgisMinimumVersion=2.0
-description=ViziTown
-version=0.1
+description=Vizitown
+about=This QGIS plugin allows interactive 3D visualization on GIS datasets in a web browser. 
+    Contributors to this project are :
+        - Mathieu CATTIN, IG
+        - Guillaume GIMENO, IG
+        - Alexandre KURTH, IG
+        - Nicolas MEUNIER, IG
+        - Louis POIGNANT, IG
+        - Camille TJHOA, IR
+        - Pierre-André LE NY, LeNy Conseil
+        - Vincent PICAVET, Oslandia
+        - Vincent MORA, Oslandia
+        - Hugo MERCIER, Oslandia
+version=0.2
 author=Cubee(ESIPE)
 email=vizitown@gmail.com
 
@@ -35,4 +47,3 @@ experimental=True
 
 # deprecated flag (applies to the whole plugin, not just a single version
 deprecated=False
-
