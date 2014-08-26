@@ -21,6 +21,7 @@
 """
 import re
 
+
 ## Provider manager
 class ProviderManager:
 
@@ -44,15 +45,14 @@ class ProviderManager:
     #  @param Ymax
     #  @param uuid
     #  @return the tile
-    def request_tile(self, Xmin, Ymin, Xmax, Ymax, uuid=None):
+    def request_tile(self, tile, uuid=None):
         result = []
         if uuid is not None:
-            self.vectors[uuid]._layer.update_color()
-            result.append(self.vectors[uuid].request_tile(Xmin, Ymin, Xmax, Ymax))
+            result.append(self.vectors[uuid].request_tile(tile))
             return result
 
         for (uuid, p) in self.vectors.items():
-            result.append(p.request_tile(Xmin, Ymin, Xmax, Ymax))
+            result.append(p.request_tile(tile))
         return result
 
     ## clear method

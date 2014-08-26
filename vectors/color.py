@@ -11,6 +11,7 @@ class Color:
     ##  Color constructor
     #   @param rendererV2 renderer link with a QgsMapLayer
     def __init__(self, renderer):
+        self.logger = core.Logger.instance()
         self._renderer = renderer
 
         #   Color type : singleSymbol, graduateSymbol, categorizedSymbol
@@ -22,6 +23,7 @@ class Color:
         #   graduateSymbol -> {'min': int, 'max': int, 'color': String(#000000)}
         #   categorizedSymbol -> {'value': , 'color': String(#000000)}
         self._colors = []
+        self._define_color()
 
     ##  Sort data according to symbol
     #   @param data ??
@@ -34,7 +36,7 @@ class Color:
     #   If user change color in QGIS an event is triggered so the renderer change
     #   and all values of color Class in same time
     #   @param rendererV2 renderer link with a QgsMapLayer
-    def update_color(self, renderer):
+    def update(self, renderer):
         self._renderer = renderer
         self._type = renderer.type()
         self._define_color()
@@ -45,10 +47,10 @@ class Color:
         color = []
         size = 0
 
-        if self._type == SINGLE:
+        if self._type == self.SINGLE:
             tabColor.append({'color': str(self._renderer.symbol().color().name())})
 
-        elif self._type == GRADUATE:
+        elif self._type == self.GRADUATE:
             lowerValue = []
             upperValue = []
 
@@ -61,7 +63,7 @@ class Color:
             for i in xrange(size):
                 tabColor.append({'min': lowerValue[i], 'max': upperValue[i], 'color': color[i]})
 
-        elif self._type == CATEGORIZED:
+        elif self._type == self.CATEGORIZED:
             value = []
 
             for symbol in self._renderer.symbols():
@@ -73,7 +75,7 @@ class Color:
                 tabColor.append({'value': value[i], 'color': color[i]})
 
         else:
-            self.logger.warning("Symbol type unhandled")
+            self.logger.warning("core/Color - Symbol type unhandled")
             #raise ValueError, "Symbol type unhandled"
 
         self._colors = tabColor
