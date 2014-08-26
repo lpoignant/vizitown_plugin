@@ -100,10 +100,14 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
         layerListIems = QgsMapLayerRegistry().instance().mapLayers().items()
         factory = vectors.VectorProviderFactory()
         for id, qgisLayer in layerListIems:
-            if self.is_dem(qgisLayer):
-                self.cb_dem.addItem(qgisLayer.name(), qgisLayer)
+            if qgisLayer.type() == QgsMapLayer.RasterLayer and qgisLayer.providerType() == "gdal":
+                if qgisLayer.bandCount() == 1:
+                    self.cb_dem.addItem(qgisLayer.name(), qgisLayer)
 
-            if self.is_vector(qgisLayer):
+                if qgisLayer.bandCount() >= 3:
+                    self.cb_texture.addItem(qgisLayer.name(), qgisLayer)
+
+            if qgisLayer.type() == QgsMapLayer.VectorLayer:
                 pvector = factory.create_provider(qgisLayer)
 
                 columnInfoLayer = pvector.get_columns_info()
@@ -111,9 +115,6 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
                 item.setData(QtCore.Qt.UserRole, pvector)
                 item.setFlags(QtCore.Qt.ItemIsEnabled)
                 self.add_vector_layer(item, columnInfoLayer)
-
-            if self.is_texture(qgisLayer):
-                self.cb_texture.addItem(qgisLayer.name(), qgisLayer)
 
     ## reset_all_fields method
     #  Reset all widgets
@@ -161,37 +162,6 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
         if self.has_raster() or self.has_vector():
             return True
         return False
-
-    ## is_raster method
-    #  Check if the layer is a Raster which come from a database
-    #  @param layer
-    #  @return True if the layer is a Raster which come from a database
-    def is_raster(self, layer):
-        return layer.type() == QgsMapLayer.RasterLayer and layer.providerType() == "gdal"
-
-
-    ## is_dem method
-    #  Check if the layer is a Data Elevation Model which come from a database
-    #  @param layer
-    #  @return True if the layer is a Data Elevation Model which come from a database
-    def is_dem(self, layer):
-        return self.is_raster(layer) and layer.bandCount() == 1
-
-
-    ## is_texture method
-    #  Check if the layer is a Texture which come from a database
-    #  @param layer
-    #  @return True if the layer is a Texture which come from a database
-    def is_texture(self, layer):
-        return self.is_raster(layer) and layer.bandCount() >= 3
-
-
-    ## is_vector method
-    #  Check if the layer is a Vector which come from a database
-    #  @param layer
-    #  @return True if the layer is a Vector which come from a database
-    def is_vector(self, layer):
-        return layer.type() == QgsMapLayer.VectorLayer
 
     ## add_vector_layer method
     #  Add vector layer in QTableWidget
@@ -251,7 +221,7 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
                     split = column2.split(" - ")
                     cname = split[0]
                     ctype = split[1]
-                    provider.add_column2(cname, ctype)
+                    provider._vector.define_column2(cname, ctype)
                 selectedLayers.append(provider)
         return selectedLayers
 
@@ -261,8 +231,6 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
     def on_btn_default_released(self):
         self.sb_port.setValue(8888)
         self.cb_tile.setCurrentIndex(2)
-        #self.tw_layers.clear()
-        #self.tw_layers.setHorizontalHeaderLabels(('Display', 'Layer', 'Field'))
 
     ## on_btn_generate_released method
     #  Generate and launch the rendering of the 3D scene
