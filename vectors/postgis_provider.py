@@ -32,6 +32,11 @@ class PostgisProvider(VectorProvider):
 
     def request_tile(self, tile):
         self._vector.update_color()
+        core.Logger.instance().debug("Request Tile Postgis Provider")
+        if not self._vector._has_2_column:
+            VectorProvider.request_tile(self, tile)
+        else:
+            self.logger.error("NOT IMPLEMENTED YET - TODO")
         raise NotImplementedError
 
     ## _parse_source method
