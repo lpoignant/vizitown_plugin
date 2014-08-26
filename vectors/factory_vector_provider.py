@@ -21,6 +21,6 @@ class VectorProviderFactory:
         elif storageType == self.POSTGIS:
             provider = PostgisProvider(vector)
         else:
-            self.logger.warning("Vector data type unhandled")
+            self.logger.warning("core/factory_vector_provider - Vector data type unhandled")
 
         return provider

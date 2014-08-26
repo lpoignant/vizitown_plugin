@@ -30,7 +30,8 @@ class PostgisProvider(VectorProvider):
         #   Define self._db use for sql request
         self.__define_database()
 
-    def request_tile(self):
+    def request_tile(self, tile):
+        self._vector.update_color()
         raise NotImplementedError
 
     ## _parse_source method
@@ -83,11 +84,11 @@ class PostgisProvider(VectorProvider):
 
     def _open_connection(self):
         if not self._db.open():
-            self.logger.error("Connection to database cannot be established")
+            self.logger.error("core/postgis_provider - Connection to database cannot be established")
             raise Exception('Connection to database cannot be established')
-        self.logger.info("Connection to db established")
+        self.logger.info("core/postgis_provider - Connection to db established")
 
 
     def _close_connection(self):
         self._db.close()
-        core.Logger.instance().info("Connection to db closed")
+        core.Logger.instance().info("core/postgis_provider - Connection to db closed")
