@@ -7,6 +7,8 @@ from .. import core
 class VectorProvider:
 
     NO_HEIGHT = "0"
+    HEIGHT = "HEIGHT"
+    COORDINATES = "coordinates"
 
     def __init__(self, vector):
         self._vector = vector
@@ -44,11 +46,11 @@ class VectorProvider:
         for feature in features:
             d = {}
             if self._vector._has_2_column:
-                d["height"] = feature.attribute(self._vector._column2_name)
+                d[self.HEIGHT] = feature.attribute(self._vector._column2_name)
             else:
-                d["height"] = self.NO_HEIGHT
+                d[self.HEIGHT] = self.NO_HEIGHT
 
-            d["coordinates"] = self._read_geo_json(feature.geometry().exportToGeoJSON())
+            d[self.COORDINATES] = self._read_geo_json(feature.geometry().exportToGeoJSON())
             ret_tile.append(d)
 
         self.logger.debug(ret_tile)

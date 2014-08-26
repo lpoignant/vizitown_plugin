@@ -4,6 +4,8 @@ from color import Color
 
 class Vector:
 
+    GEOMETRY = "geometry"
+
     def __init__(self, QgsMapLayer):
         self.logger = core.Logger.instance()
         self._qgisLayer = QgsMapLayer
@@ -30,7 +32,7 @@ class Vector:
         self._has_2_column = True
         self._column2_name = name
         self._column2_type = type
-        if type == "geometry":
+        if type == self.GEOMETRY:
             self._column2_is_geom = True
         self.logger.debug("core/vector - _has_2_column -> " + str(self._has_2_column))
         self.logger.debug("core/vector - _column2_name -> " + self._column2_name)
