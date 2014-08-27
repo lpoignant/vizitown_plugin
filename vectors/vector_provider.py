@@ -1,7 +1,7 @@
+import logging
+
 from qgis.core import QgsRectangle
 from qgis.core import QgsFeatureRequest
-
-from .. import core
 
 
 class VectorProvider:
@@ -12,7 +12,7 @@ class VectorProvider:
 
     def __init__(self, vector):
         self._vector = vector
-        self.logger = core.Logger.instance()
+        self.logger = logging.getLogger('Vizitown')
 
     ## get_column_info metho
     # Gives all data column name + data type

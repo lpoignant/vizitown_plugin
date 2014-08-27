@@ -22,6 +22,7 @@
 import sys
 import os
 import json
+import logging
 from multiprocessing import Queue
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -44,7 +45,6 @@ class CorsStaticFileHandler(StaticFileHandler):
     #  Define the headers for the default handler
     #  @override cyclone.web.StaticFileHandler
     def set_default_headers(self):
-        core.Logger.instance().info("Initialize web server")
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
         self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
@@ -59,7 +59,7 @@ class InitHandler(RequestHandler):
     #  Initialize the handler for the init parameter
     #  @override cyclone.web.RequestHandler
     def initialize(self):
-        core.Logger.instance().info("Initialize init message")
+        logging.getLogger('Vizitown').info("Initialize init message")
         self.scene = core.Scene.instance()
 
     ## set_default_headers method
@@ -87,7 +87,7 @@ class DataHandler(WebSocketHandler):
     #  Method call when the websocket is opened
     #  @override cyclone.websocket.WebSocketHandler
     def connectionMade(self):
-        self.logger = core.Logger.instance()
+        self.logger = logging.getLogger('Vizitown')
         self.scene = core.Scene.instance()
         self.logger.info("vt_as_handlers - WebSocket data opened")
         self.translator = PostgisToJSON()
@@ -145,7 +145,7 @@ class SyncHandler(WebSocketHandler):
     #  Method to initialize the handler
     #  @override cyclone.websocket.WebSocketHandler
     def initialize(self):
-        self.logger = core.Logger.instance()
+        self.logger = logging.getLogger('Vizitown')
         self.logger.info("vt_as_handlers - Initialize websocket sync")
         SyncManager.instance().add_listener(self)
 
@@ -192,7 +192,7 @@ class TilesInfoHandler(WebSocketHandler):
     #  Method to initialize the handler
     #  @override cyclone.websocket.WebSocketHandler
     def initialize(self):
-        self.logger = core.Logger.instance()
+        self.logger = logging.getLogger('Vizitown')
         self.logger.info("vt_as_handlers - Initialize Tiles Info WebSocket")
         self.scene = core.Scene.instance()
         self.result = ResultVTTiler.instance()

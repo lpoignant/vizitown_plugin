@@ -20,7 +20,27 @@ VizitownDialog
 ***************************************************************************/
 """
 
+import logging
+import sys
+import os
+
 ## classFactory load Vizitown class from file Vizitown
 def classFactory(iface):
+    logger = logging.getLogger('Vizitown')
+    logger.setLevel(logging.DEBUG)
+
+    # Define file with entire path 
+    loggerPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "vizitown.log")
+
+    fh = logging.FileHandler(loggerPath)
+    fh.setLevel(logging.DEBUG)
+
+    format = '%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s'
+    formatter = logging.Formatter(format)
+
+    fh.setFormatter(formatter)
+
+    logger.addHandler(fh)
+
     from vizitown import Vizitown
     return Vizitown(iface)

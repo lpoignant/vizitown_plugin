@@ -1,6 +1,6 @@
-from qgis.core import *
+import logging
 
-from .. import core
+from qgis.core import *
 
 
 class Color:
@@ -11,7 +11,7 @@ class Color:
     ##  Color constructor
     #   @param rendererV2 renderer link with a QgsMapLayer
     def __init__(self, renderer):
-        self.logger = core.Logger.instance()
+        self.logger = logging.getLogger('Vizitown')
         self._renderer = renderer
 
         #   Color type : singleSymbol, graduateSymbol, categorizedSymbol

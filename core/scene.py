@@ -1,9 +1,8 @@
 import os
 import sys
+import logging
 
 from multiprocessing import Queue
-
-from logger import Logger
 
 from singleton import Singleton
 from provider_manager import ProviderManager
@@ -15,6 +14,8 @@ class Scene:
     def __init__(self):
         self.rastersPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../rasters")
         self.viewerPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../vt_viewer")
+
+        self.logger = logging.getLogger('Vizitown')
 
         self.GDALqueue = Queue()
         self.dem = None

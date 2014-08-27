@@ -24,6 +24,7 @@ import os
 import sys
 import webbrowser
 import time
+import logging
 
 from ui_vizitown import Ui_Vizitown
 from PyQt4 import QtCore, QtGui
@@ -48,7 +49,7 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
     #  @param extent the initial extent
     def __init__(self, extent):
         QtGui.QDialog.__init__(self)
-        core.Logger.instance().info("Launch Vizitown")
+        self.logger = logging.getLogger('Vizitown')
         self.setupUi(self)
         self.destroyed.connect(self.closeEvent)
         self.appServer = None

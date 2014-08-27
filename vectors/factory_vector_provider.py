@@ -1,7 +1,8 @@
+import logging
+
 from vector import Vector
 from postgis_provider import PostgisProvider
 from shapefile_provider import ShapefileProvider
-from .. import core
 
 
 class VectorProviderFactory:
@@ -9,7 +10,7 @@ class VectorProviderFactory:
     POSTGIS = "PostgreSQL database with PostGIS extension"
 
     def __init__(self):
-        self.logger = core.Logger.instance()
+        self.logger = logging.getLogger('Vizitown')
     
     def create_provider(self, QgsMapLayer):
         vector = Vector(QgsMapLayer)

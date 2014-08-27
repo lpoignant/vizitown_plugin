@@ -1,8 +1,7 @@
 import re
+import logging
 
 from PyQt4.QtSql import *
-
-from .. import core
 
 from vector_provider import VectorProvider
 
@@ -10,7 +9,7 @@ class PostgisProvider(VectorProvider):
 
     def __init__(self, vector):
         VectorProvider.__init__(self, vector)
-        self.logger = core.Logger.instance()
+        self.logger = logging.getLogger('Vizitown')
 
         self._dbname    = None
         self._host      = None
@@ -32,7 +31,7 @@ class PostgisProvider(VectorProvider):
 
     def request_tile(self, tile):
         self._vector.update_color()
-        core.Logger.instance().debug("Request Tile Postgis Provider")
+        self.logger.debug("Request Tile Postgis Provider")
 
         if self._vector._column2_is_geom:
             # If column 2 is a geometry consider is 3D layer
@@ -86,7 +85,7 @@ class PostgisProvider(VectorProvider):
         self._db.setPort(self._port)
         self._db.setUserName(self._user)
         self._db.setPassword(self._password)
-        core.Logger.instance().info("Database define")
+        self.logger.info("Database define")
 
     def _open_connection(self):
         if not self._db.open():
@@ -97,4 +96,4 @@ class PostgisProvider(VectorProvider):
 
     def _close_connection(self):
         self._db.close()
-        core.Logger.instance().info("core/postgis_provider - Connection to db closed")
+        self.logger.info("core/postgis_provider - Connection to db closed")

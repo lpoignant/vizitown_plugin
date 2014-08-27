@@ -1,4 +1,5 @@
-from .. import core
+import logging
+
 from color import Color
 
 
@@ -7,7 +8,7 @@ class Vector:
     GEOMETRY = "geometry"
 
     def __init__(self, QgsMapLayer):
-        self.logger = core.Logger.instance()
+        self.logger = logging.getLogger('Vizitown')
         self._qgisLayer = QgsMapLayer
 
         self._has_2_column = False

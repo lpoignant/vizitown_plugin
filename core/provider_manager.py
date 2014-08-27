@@ -20,7 +20,7 @@
  ***************************************************************************/
 """
 import re
-
+import logging
 
 ## Provider manager
 class ProviderManager:
@@ -30,6 +30,7 @@ class ProviderManager:
         self.vectors = {}
         self.dem = None
         self.texture = None
+        self.logger = logging.getLogger('Vizitown')
 
     ## add_vector_provider method
     #  Add a vector provider to the manager
