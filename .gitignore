@@ -5,6 +5,7 @@ GDAL_Process.err
 GDAL_Process.out
 ui_vizitown.ui.autosave
 rasters
+data
 pep8.bat
 clear.sh
 vizitown.log
