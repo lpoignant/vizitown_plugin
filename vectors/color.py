@@ -23,6 +23,8 @@ class Color:
         #   graduateSymbol -> {'min': int, 'max': int, 'color': String(#000000)}
         #   categorizedSymbol -> {'value': , 'color': String(#000000)}
         self._colors = []
+        self._column_color = None
+
         self._define_color()
 
     ##  Sort data according to symbol
@@ -78,4 +80,14 @@ class Color:
             self.logger.warning("core/Color - Symbol type unhandled")
             #raise ValueError, "Symbol type unhandled"
 
+        self._column_color = self.get_column_color()
         self._colors = tabColor
+
+    ## get_column_color method
+    #  Get the name of the column where the analysis was perform. If there isn't analysis, the name is none
+    #  @return the color column
+    def get_column_color(self):
+        if self._type == self.SINGLE:
+            return None
+        if self._type == self.GRADUATE or self._type == self.CATEGORIZED:
+            return self._renderer.classAttribute()
