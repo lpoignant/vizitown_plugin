@@ -13,7 +13,3 @@ class ShapefileProvider(VectorProvider):
     def __init__(self, vector):
         VectorProvider.__init__(self, vector)
         self.logger = logging.getLogger('Vizitown')
-
-    def request_tile(self, tile):
-        self._vector.update_color()
-        VectorProvider.request_tile(self, tile)

@@ -7,3 +7,5 @@ from postgis_provider import PostgisProvider
 
 from vector import Vector
 from color import Color
+
+from converter import Converter

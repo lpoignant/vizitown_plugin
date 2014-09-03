@@ -77,7 +77,7 @@ class Color:
                 tabColor.append({'value': value[i], 'color': color[i]})
 
         else:
-            self.logger.warning("core/Color - Symbol type unhandled")
+            self.logger.warning("Symbol type unhandled")
             #raise ValueError, "Symbol type unhandled"
 
         self._column_color = self.get_column_color()

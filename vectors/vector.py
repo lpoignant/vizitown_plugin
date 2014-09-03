@@ -17,10 +17,14 @@ class Vector:
         self._column2_type = None
 
         self._displayName = QgsMapLayer.name()
-        # Have to be improve
-        self._uuid = self._displayName
 
         self._color = Color(QgsMapLayer.rendererV2())
+
+        # Data for browser
+        self._geometry = None
+        self._dimension = None
+        # Have to be improve
+        self._uuid = self._displayName
 
     def update_color(self):
         renderer = self._qgisLayer.rendererV2()
@@ -28,6 +32,14 @@ class Vector:
 
     def get_renderer(self):
         return self._qgisLayer.rendererV2()
+
+    def has_column_color(self):
+        if self._color._column_color is not None:
+            return True
+        return False
+
+    def get_column_color(self):
+        return self._color._column_color
 
     def define_column2(self, name, type):
         self._has_2_column = True
