@@ -22,7 +22,7 @@ class Color:
         #   singleSymbol -> {'color': String(#000000)}
         #   graduateSymbol -> {'min': int, 'max': int, 'color': String(#000000)}
         #   categorizedSymbol -> {'value': , 'color': String(#000000)}
-        self._colors = []
+        self._colors = None
         self._column_color = None
 
         self._define_color()

@@ -11,18 +11,15 @@ class PostgisProvider(VectorProvider):
         VectorProvider.__init__(self, vector)
         self.logger = logging.getLogger('Vizitown')
 
-        self._dbname    = None
-        self._host      = None
-        self._port      = None
-        self._user      = None
-        self._password  = None
-        self._table     = None
-        self._column    = None
+        self._dbname = None
+        self._host = None
+        self._port = None
+        self._user = None
+        self._password = None
+        self._table = None
+        self._column = None
 
-        self._db        = None
-
-        #   Define SRID UNUSE right now
-        #VectorProvider._vector._srid = self._vector._qgisLayer.crs().postgisSrid()
+        self._db = None
 
         #   Define above variables
         self._parse_source()
@@ -35,6 +32,8 @@ class PostgisProvider(VectorProvider):
 
         if self._vector._column2_is_geom:
             # If column 2 is a geometry consider is 3D layer
+            # TODO RE USE FROM PAST VERSION TOTALY MANUAL OPERATIONS
+            # TODO SQL REQUEST, READ RESULT, SORT, CONVERT
             self.logger.error("NOT IMPLEMENTED YET - TODO")
         else:
             VectorProvider.request_tile(self, tile)

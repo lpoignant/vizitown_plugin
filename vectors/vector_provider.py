@@ -73,37 +73,71 @@ class VectorProvider:
                 d[self.HEIGHT] = self.NO_HEIGHT
 
             if self._vector.has_column_color():
-                d[self.DATA] = feature.attribute(self.vector._get_column_color())
+                d[self.DATA] = feature.attribute(self._vector.get_column_color())
 
             geojson = json.loads(feature.geometry().exportToGeoJSON())
             geom_type = geojson[self.TYPE_JSON]
             coordinates = geojson[self.COORDINATES_JSON]
-            if _is_multi(geom_type):
+            if self._is_multi(geom_type):
                 # Multi part geom
-                for
+                for geometry in coordinates:
+                    d[self.COORDINATES_JSON] = self._read_geometry(geometry, geom_type)
+                    ret_tile.append(d)
             else:
                 # Simple part geom
-            d[self.COORDINATES_JSON] = self._read_geojson()
-            ret_tile.append(d)
+                d[self.COORDINATES_JSON] = self._read_geometry(coordinates, geom_type)
+                ret_tile.append(d)
 
-        #self.logger.debug(ret_tile)
+        if not self._can_convert():
+            self.logger.error("Impossible to convert data from vector : " + self._vector._display_name)
+
+        # TODO
+        # SORT RESULT -> USE COLOR CLASS
+        # CONVERT RESULT -> USE CONVERTER CLASS
+
         return ret_tile
 
-    def _read_coordinates(self, array):
-        #self.logger.debug(geom)
-        return None
+    def _read_geometry(self, array, geometry_type):
+        coord = []
+        if self._is_point(geometry_type):
+            return self._read_point(array, coord)
+        elif self._is_line(geometry_type):
+            for point in array:
+                coord = self._read_point(point, coord)
+            return coord
+        elif self._is_polygon(geometry_type):
+            for line in array:
+                for point in line:
+                    coord = self._read_point(point, coord)
+            return coord
+        else:
+            self.logger.error("Unexpected geometry type " + geometry_type)
+
+    def _read_point(self, array_in, array_out):
+        out = array_out
+        # Add X
+        out.append(array_in[0]) 
+        # Add Y
+        out.append(array_in[1])
+        return out
 
     def _is_multi(self, geometry_type):
         return geometry_type.startswith(self.MULTI)
 
     def _is_point(self, gtype):
-        return gtype == self.POINT_1 || gtype == self.POINT_2
+        return gtype == self.POINT_1 or gtype == self.POINT_2
 
     def _is_line(self, gtype):
-        return gtype == self.LINE_1 || gtype == self.LINE_2
+        return gtype == self.LINE_1 or gtype == self.LINE_2
 
     def _is_polygon(self, gtype):
-        return gtype == self.POLYGON_1 || gtype == self.POLYGON_2
+        return gtype == self.POLYGON_1 or gtype == self.POLYGON_2
 
     def _can_convert(self):
+        if self._vector._dimension is None:
+            return False
+        if self._vector._geometry is None:
+            return False
+        if self._vector._color._colors is None:
+            return False
         return True
