@@ -77,5 +77,5 @@ class ProviderManager:
     def get_all_vectors(self):
         vectors = []
         for (uuid, p) in self.vectors.items():
-            vectors.append({'uuid': uuid, 'name': p._layer._displayName})
+            vectors.append({'uuid': uuid, 'name': p._layer._display_name})
         return vectors

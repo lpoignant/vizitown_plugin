@@ -68,7 +68,7 @@ class Scene:
         array = []
         for vectorp in arrayProviders:
             self.providerManager.add_vector_provider(vectorp)
-            name = vectorp._vector._displayName
+            name = vectorp._vector._display_name
             uuid = vectorp._vector._uuid
             array.append({'uuid':uuid, 'name':name})
         self.all_vectors = array
