@@ -112,7 +112,7 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
                 pvector = factory.create_provider(qgisLayer)
 
                 columnInfoLayer = pvector.get_columns_info()
-                item = QtGui.QTableWidgetItem(pvector._vector._displayName)
+                item = QtGui.QTableWidgetItem(pvector._vector._display_name)
                 item.setData(QtCore.Qt.UserRole, pvector)
                 item.setFlags(QtCore.Qt.ItemIsEnabled)
                 self.add_vector_layer(item, columnInfoLayer)
