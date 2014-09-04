@@ -89,7 +89,7 @@ class DataHandler(WebSocketHandler):
     def connectionMade(self):
         self.logger = logging.getLogger('Vizitown')
         self.scene = core.Scene.instance()
-        self.logger.info("vt_as_handlers - WebSocket data opened")
+        self.logger.info("WebSocket data opened")
         self.translator = PostgisToJSON()
 
     ## messageReceived method
@@ -100,12 +100,12 @@ class DataHandler(WebSocketHandler):
     #   '{"Xmin": 0, "Ymin": 0, "Xmax": 50, "Ymax": 50, uuid: "my_uuid"}' for a request only a specific vector
     #  @override cyclone.websocket.WebSocketHandler
     def messageReceived(self, message):
-        self.logger.debug("vt_as_handlers - Received message -> " + message)  
+        self.logger.debug("Received message -> " + message)  
 
         # Keep alive connection
         if message == "ping":
             self.sendMessage("pong")
-            self.logger.debug("vt_as_handlers - Send pong to keep alive connection")
+            self.logger.debug("Send pong to keep alive connection")
             return
 
         json_tile = json.loads(message)
@@ -124,7 +124,7 @@ class DataHandler(WebSocketHandler):
             for i in range(len(v['results'])):
                 if v['results'][i]:
                     json_ = self.translator.parse(v['results'][i], v['geom'], v['hasH'], v['color'][i], v['uuid'])
-                    self.logger.debug("vt_as_handlers - Send json -> " + json_)
+                    self.logger.debug("Send json -> " + json_)
                     self.sendMessage(json_)
 
     ## connectionLost method
@@ -132,7 +132,7 @@ class DataHandler(WebSocketHandler):
     #  @param reason to indicate the reason of the closed instance
     #  @override cyclone.websocket.WebSocketHandler
     def connectionLost(self, reason):
-        self.logger.info("vt_as_handlers - WebSocket data closed")
+        self.logger.info("WebSocket data closed")
 
 
 ## Synchronisation Handler
@@ -146,21 +146,21 @@ class SyncHandler(WebSocketHandler):
     #  @override cyclone.websocket.WebSocketHandler
     def initialize(self):
         self.logger = logging.getLogger('Vizitown')
-        self.logger.info("vt_as_handlers - Initialize websocket sync")
+        self.logger.info("Initialize websocket sync")
         SyncManager.instance().add_listener(self)
 
     ## connectionMade method
     #  Method call when the websocket is opened
     #  @override cyclone.websocket.WebSocketHandler
     def connectionMade(self):
-        self.logger.info("vt_as_handlers - WebSocket sync opened")
+        self.logger.info("WebSocket sync opened")
 
     ## meassageReceived method
     #  Method call when a message is received
     #  @param message received
     #  @override cyclone.websocket.WebSocketHandler
     def messageReceived(self, message):
-        self.logger.debug("vt_as_handlers - Received message -> " + message)
+        self.logger.debug("Received message -> " + message)
         # Keep alive connection
         if message == "ping":
             self.sendMessage("pong")
@@ -172,13 +172,13 @@ class SyncHandler(WebSocketHandler):
     #  @param reason to indicate the reason of the closed instance
     #  @override cyclone.websocket.WebSocketHandler
     def connectionLost(self, reason):
-        self.logger.info("vt_as_handlers - WebSocket sync closed")
+        self.logger.info("WebSocket sync closed")
 
     ## on_finish method
     #  Method remove the listener
     #  @override cyclone.websocket.WebSocketHandler
     def on_finish(self):
-        self.logger.info("vt_as_handlers - WebSocket finished")
+        self.logger.info("WebSocket finished")
         SyncManager.instance().remove_listener(self)
 
 
@@ -193,7 +193,7 @@ class TilesInfoHandler(WebSocketHandler):
     #  @override cyclone.websocket.WebSocketHandler
     def initialize(self):
         self.logger = logging.getLogger('Vizitown')
-        self.logger.info("vt_as_handlers - Initialize Tiles Info WebSocket")
+        self.logger.info("Initialize Tiles Info WebSocket")
         self.scene = core.Scene.instance()
         self.result = ResultVTTiler.instance()
 
@@ -201,7 +201,7 @@ class TilesInfoHandler(WebSocketHandler):
     #  Method call when the websocket is opened
     #  @override cyclone.websocket.WebSocketHandler
     def connectionMade(self):
-        self.logger.info("vt_as_handlers - WebSocket tiles_info opened")
+        self.logger.info("WebSocket tiles_info opened")
 
         if not self.result.is_define():
             self.result.set_result(self.scene.GDALqueue.get())
@@ -209,9 +209,9 @@ class TilesInfoHandler(WebSocketHandler):
             self.scene.GDALprocess.terminate()
 
         if self.scene.GDALprocess and self.scene.GDALprocess.is_alive():
-            self.logger.info("vt_as_handlers - Wait GDAL tiling ...")
+            self.logger.info("Wait GDAL tiling ...")
             self.scene.GDALprocess.join()
-            self.logger.info("vt_as_handlers - Send tiles info ...")
+            self.logger.info("Send tiles info ...")
 
         tilesInfo = self.scene.get_tiling_param()
         # Add pixel Size in JSON and Min/Max height if have dem
@@ -222,7 +222,7 @@ class TilesInfoHandler(WebSocketHandler):
                 tilesInfo['maxHeight'] = self.result.maxHeight
 
         js = json.dumps(tilesInfo, separators=(',', ':'))
-        self.logger.debug("vt_as_handlers - Send message tilesInfo -> " + js)
+        self.logger.debug("Send message tilesInfo -> " + js)
         self.sendMessage(js)
 
     ## connectionLost method
@@ -230,4 +230,4 @@ class TilesInfoHandler(WebSocketHandler):
     #  @param reason to indicate the reason of the closed instance
     #  @override cyclone.websocket.WebSocketHandler
     def connectionLost(self, reason):
-        self.logger.info("vt_as_handlers - WebSocket tiles_info closed")
+        self.logger.info("WebSocket tiles_info closed")
