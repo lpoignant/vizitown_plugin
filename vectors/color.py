@@ -8,6 +8,17 @@ class Color:
     GRADUATE = "graduatedSymbol"
     CATEGORIZED = "categorizedSymbol"
 
+    HEIGHT = "height"
+    DATA = "data"
+    COORDINATES_JSON = "coordinates"
+
+    MIN = "min"
+    MAX = "max"
+    VALUE = "value"
+
+    COLOR = "color"
+    FEATURE = "feature"
+
     ##  Color constructor
     #   @param rendererV2 renderer link with a QgsMapLayer
     def __init__(self, renderer):
@@ -32,8 +43,68 @@ class Color:
     #   @return ??
     def sort_result(self, data):
         # I'm waiting to see what data can i get
-        raise NotImplementedError, "TO DO"
+        if self._type == self.SINGLE:
+            sort_data = self._sort_single(data)
+        elif self._type == self.GRADUATE:
+            sort_data = self._sort_graduated(data)
+        elif self._type == self.CATEGORIZED:
+            sort_data = self._sort_categorized(data)
+        else:
+            self.logger.error("Unexpected data type")
 
+        return self._associate_color(sort_data)
+
+    def _sort_single(self, feature_array):
+        nbColor = len(self._colors)
+        array = [[] for i in range(nbColor)]
+
+        for feature in feature_array:
+            for i in range(nbColor):
+                array[i].append(feature)
+        return array
+
+    ## _get_result_graduated_symbol method
+    #  Run through the iterator to check the associated symbol and sorted it
+    #  @param iterator
+    #  @return the table with the data and associated symbol
+    def _sort_graduated(self, feature_array):
+        nbColor = len(self._colors)
+        array = [[] for i in range(nbColor)]
+
+        for feature in feature_array:
+            for i in range(nbColor):
+                data = feature[self.DATA]
+                
+                if (data >= self._colors[i][self.MIN] and
+                        data <= self._colors[i][self.MAX]):
+                    del feature[self.DATA]
+                    array[i].append(feature)
+                    break
+        return array
+
+    ## _get_result_categorized_symbol method
+    #  Run through the iterator to check the associated symbol and sorted it
+    #  @param iterator
+    #  @return the table with the data and associated symbol
+    def _sort_categorized(self, feature_array):
+        nbColor = len(self._colors)
+        array = [[] for i in range(nbColor)]
+
+        for feature in feature_array:
+            for i in range(nbColor):
+                if str(feature[self.DATA]) == str(self._colors[i][self.VALUE]):
+                    del feature[self.DATA]
+                    array[i].append(feature)
+                    break
+        return array
+
+    def _associate_color(self, array):
+        ret = []
+        for i in range(len(self._colors)):
+            d = {self.COLOR : self._colors[i][self.COLOR]}
+            d[self.FEATURE] = array[i]
+            ret.append(d)
+        return ret
     ##  
     #   If user change color in QGIS an event is triggered so the renderer change
     #   and all values of color Class in same time
@@ -50,7 +121,7 @@ class Color:
         size = 0
 
         if self._type == self.SINGLE:
-            tabColor.append({'color': str(self._renderer.symbol().color().name())})
+            tabColor.append({self.COLOR : str(self._renderer.symbol().color().name())})
 
         elif self._type == self.GRADUATE:
             lowerValue = []
@@ -63,7 +134,7 @@ class Color:
                 lowerValue.append(_range.lowerValue())
                 upperValue.append(_range.upperValue())
             for i in xrange(size):
-                tabColor.append({'min': lowerValue[i], 'max': upperValue[i], 'color': color[i]})
+                tabColor.append({self.MIN : lowerValue[i], self.MAX : upperValue[i], self.COLOR : color[i]})
 
         elif self._type == self.CATEGORIZED:
             value = []
@@ -74,7 +145,7 @@ class Color:
             for categorie in self._renderer.categories():
                 value.append(categorie.value())
             for i in xrange(size):
-                tabColor.append({'value': value[i], 'color': color[i]})
+                tabColor.append({self.VALUE : value[i], self.COLOR : color[i]})
 
         else:
             self.logger.warning("Symbol type unhandled")
