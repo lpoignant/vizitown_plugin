@@ -1,3 +1,4 @@
+import uuid
 import logging
 
 from color import Color
@@ -23,12 +24,12 @@ class Vector:
         # Data for browser
         self._geometry = None
         self._dimension = None
-        # Have to be improve
-        self._uuid = self._display_name
+        self._uuid = str(uuid.uuid1())
 
     def update_color(self):
         renderer = self._qgisLayer.rendererV2()
         self._color.update(renderer)
+        self.define_dimension()
 
     def get_renderer(self):
         return self._qgisLayer.rendererV2()
@@ -50,10 +51,16 @@ class Vector:
         self.define_dimension()
 
     def define_dimension(self):
-        if not self._has_2_column:
-            self._dimension = 2
-        else:
+        if self._has_2_column:
             if self._column2_is_geom:
                 self._dimension = 3
             else:
                 self._dimension = 2.5
+        else:
+            self._dimension = 2
+
+    def define_geometry(self, gtype=None):
+        if gtype is not None:
+            self._geometry = gtype
+        else:
+            self._geometry = self._qgisLayer.geometryType()
