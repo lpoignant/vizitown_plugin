@@ -3,6 +3,8 @@ import logging
 from qgis.core import *
 
 
+##  Color Class
+#   TODO
 class Color:
     SINGLE = "singleSymbol"
     GRADUATE = "graduatedSymbol"
@@ -54,6 +56,10 @@ class Color:
 
         return self._associate_color(sort_data)
 
+    ## _sort_single method
+    #  TODO
+    #  @param feature_array
+    #  @return an array
     def _sort_single(self, feature_array):
         nbColor = len(self._colors)
         array = [[] for i in range(nbColor)]
@@ -63,10 +69,10 @@ class Color:
                 array[i].append(feature)
         return array
 
-    ## _get_result_graduated_symbol method
-    #  Run through the iterator to check the associated symbol and sorted it
-    #  @param iterator
-    #  @return the table with the data and associated symbol
+    ## _sort_graduated method
+    #  TODO
+    #  @param feature_array
+    #  @return an array
     def _sort_graduated(self, feature_array):
         nbColor = len(self._colors)
         array = [[] for i in range(nbColor)]
@@ -74,7 +80,7 @@ class Color:
         for feature in feature_array:
             for i in range(nbColor):
                 data = feature[self.DATA]
-                
+
                 if (data >= self._colors[i][self.MIN] and
                         data <= self._colors[i][self.MAX]):
                     del feature[self.DATA]
@@ -82,10 +88,10 @@ class Color:
                     break
         return array
 
-    ## _get_result_categorized_symbol method
-    #  Run through the iterator to check the associated symbol and sorted it
-    #  @param iterator
-    #  @return the table with the data and associated symbol
+    ## _sort_categorized method
+    #  TODO
+    #  @param feature_array
+    #  @return an array
     def _sort_categorized(self, feature_array):
         nbColor = len(self._colors)
         array = [[] for i in range(nbColor)]
@@ -98,14 +104,19 @@ class Color:
                     break
         return array
 
+    ##  _associate_color method
+    #   TODO
+    #   @param array
+    #   @return an array
     def _associate_color(self, array):
         ret = []
         for i in range(len(self._colors)):
-            d = {self.COLOR : self._colors[i][self.COLOR]}
+            d = {self.COLOR: self._colors[i][self.COLOR]}
             d[self.FEATURE] = array[i]
             ret.append(d)
         return ret
-    ##  
+
+    ##  update method
     #   If user change color in QGIS an event is triggered so the renderer change
     #   and all values of color Class in same time
     #   @param rendererV2 renderer link with a QgsMapLayer
@@ -114,14 +125,15 @@ class Color:
         self._type = renderer.type()
         self._define_color()
 
-    ##  Define all useful informations to sort vector data
+    ##  _define_color method
+    #   Define all useful informations to sort vector data
     def _define_color(self):
         tabColor = []
         color = []
         size = 0
 
         if self._type == self.SINGLE:
-            tabColor.append({self.COLOR : str(self._renderer.symbol().color().name())})
+            tabColor.append({self.COLOR: str(self._renderer.symbol().color().name())})
 
         elif self._type == self.GRADUATE:
             lowerValue = []
@@ -134,7 +146,7 @@ class Color:
                 lowerValue.append(_range.lowerValue())
                 upperValue.append(_range.upperValue())
             for i in xrange(size):
-                tabColor.append({self.MIN : lowerValue[i], self.MAX : upperValue[i], self.COLOR : color[i]})
+                tabColor.append({self.MIN: lowerValue[i], self.MAX: upperValue[i], self.COLOR: color[i]})
 
         elif self._type == self.CATEGORIZED:
             value = []
@@ -145,11 +157,10 @@ class Color:
             for categorie in self._renderer.categories():
                 value.append(categorie.value())
             for i in xrange(size):
-                tabColor.append({self.VALUE : value[i], self.COLOR : color[i]})
+                tabColor.append({self.VALUE: value[i], self.COLOR: color[i]})
 
         else:
-            self.logger.warning("Symbol type unhandled")
-            #raise ValueError, "Symbol type unhandled"
+            self.logger.error("Symbol type unhandled")
 
         self._column_color = self.get_column_color()
         self._colors = tabColor

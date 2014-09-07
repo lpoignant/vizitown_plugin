@@ -5,8 +5,14 @@ from PyQt4.QtSql import *
 
 from vector_provider import VectorProvider
 
+
+##  PostgisProvider class
+#   TODO
 class PostgisProvider(VectorProvider):
 
+    ##  Constructor
+    #   TODO
+    #   @param vector
     def __init__(self, vector):
         VectorProvider.__init__(self, vector)
         self.logger = logging.getLogger('Vizitown')
@@ -26,9 +32,11 @@ class PostgisProvider(VectorProvider):
         #   Define self._db use for sql request
         self.__define_database()
 
+    ##  request_tile method
+    #   TODO
+    #   @param tile
     def request_tile(self, tile):
         self._vector.update_color()
-        self.logger.debug("Request Tile Postgis Provider")
 
         if self._vector._column2_is_geom:
             # If column 2 is a geometry consider is 3D layer
@@ -36,7 +44,7 @@ class PostgisProvider(VectorProvider):
             # TODO SQL REQUEST, READ RESULT, SORT, CONVERT
             self.logger.error("NOT IMPLEMENTED YET - TODO")
         else:
-            VectorProvider.request_tile(self, tile)
+            return VectorProvider.request_tile(self, tile)
 
     ## _parse_source method
     #  Parse QgsMapLayer.source() (String) to save useful data
@@ -76,7 +84,7 @@ class PostgisProvider(VectorProvider):
         self._vector._uuid = re.sub("\"", "", str(self._dbname + self._table + self._column))
 
     ##  _define_database method
-    #   write comment
+    #   TODO
     def __define_database(self):
         self._db = QSqlDatabase.addDatabase("QPSQL", self._vector._uuid)
         self._db.setHostName(self._host)
@@ -86,13 +94,16 @@ class PostgisProvider(VectorProvider):
         self._db.setPassword(self._password)
         self.logger.info("Database define")
 
+    ##  _open_connection method
+    #   TODO
     def _open_connection(self):
         if not self._db.open():
             self.logger.error("core/postgis_provider - Connection to database cannot be established")
             raise Exception('Connection to database cannot be established')
         self.logger.info("core/postgis_provider - Connection to db established")
 
-
+    ##  _close_connection method
+    #   TODO
     def _close_connection(self):
         self._db.close()
         self.logger.info("core/postgis_provider - Connection to db closed")

@@ -36,6 +36,7 @@ from vt_utils_converter import PostgisToJSON
 from vt_as_sync import SyncManager
 from vt_utils_result_vttiler import ResultVTTiler
 
+
 ## Class CorsStaticFileHandler
 #  A static file handler which authorize cross origin
 #  Unherited cyclone.web.StaticFileHandler
@@ -82,6 +83,7 @@ class InitHandler(RequestHandler):
 #  retreived from postgis to the web browser
 #  Unherited cyclone.websocket.WebSocketHandler
 class DataHandler(WebSocketHandler):
+    UUID = "uuid"
 
     ## connectionMade method
     #  Method call when the websocket is opened
@@ -100,7 +102,7 @@ class DataHandler(WebSocketHandler):
     #   '{"Xmin": 0, "Ymin": 0, "Xmax": 50, "Ymax": 50, uuid: "my_uuid"}' for a request only a specific vector
     #  @override cyclone.websocket.WebSocketHandler
     def messageReceived(self, message):
-        self.logger.debug("Received message -> " + message)  
+        self.logger.debug("Received message -> " + message)
 
         # Keep alive connection
         if message == "ping":
@@ -109,23 +111,20 @@ class DataHandler(WebSocketHandler):
             return
 
         json_tile = json.loads(message)
-        tile = core.Tile(**json_tile)
+        dictionary = dict(**json_tile)
+        if self.UUID in dictionary:
+            uuid = dictionary[self.UUID]
+            del dictionary[self.UUID]
+        else:
+            uuid = None
+
+        tile = core.Tile(**dictionary)
         provider_manager = self.scene.providerManager
-        provider_manager.request_tile(tile)
-        return
-        # STUB
+        tiles = provider_manager.request_tile(tile)
 
-        vectors = ProviderManager.instance().request_tile(**d)
-        if not vectors:
-            self.sendMessage("{}")
-            return
-
-        for v in vectors:
-            for i in range(len(v['results'])):
-                if v['results'][i]:
-                    json_ = self.translator.parse(v['results'][i], v['geom'], v['hasH'], v['color'][i], v['uuid'])
-                    self.logger.debug("Send json -> " + json_)
-                    self.sendMessage(json_)
+        for tile in tiles:
+            for part in tile:
+                self.sendMessage(json.dumps(part, separators=(',', ': ')))
 
     ## connectionLost method
     #  Method call when the websocket is closed
