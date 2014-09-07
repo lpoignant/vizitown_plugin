@@ -9,7 +9,7 @@ VizitownDialog
         copyright            : (C) 2014 by Cubee(ESIPE)
         email                : vizitown@gmail.com
 ***************************************************************************/
-    
+
 /***************************************************************************
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -25,16 +25,18 @@ import sys
 import os
 
 from logging import handlers
+
+
 ## classFactory load Vizitown class from file Vizitown
 def classFactory(iface):
     logger = logging.getLogger('Vizitown')
     logger.setLevel(logging.DEBUG)
 
-    # Define file with entire path 
+    # Define file with entire path
     loggerPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "vizitown.log")
 
-    fh = logging.handlers.RotatingFileHandler(loggerPath, mode='a', maxBytes=5000, backupCount=5)
-    
+    fh = logging.handlers.RotatingFileHandler(loggerPath, mode='a', maxBytes=5000000, backupCount=5)
+
     fh.setLevel(logging.DEBUG)
 
     format = '%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s'

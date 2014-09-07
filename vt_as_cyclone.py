@@ -29,7 +29,6 @@ sys.path.pop(0)
 
 import core
 
-from vt_test_handlers import PingHandler, EchoHandler
 from vt_as_handlers import *
 
 
@@ -63,9 +62,7 @@ class CycloneThread(QThread):
 
         if self.scene.get_viewer_param()['hasRaster']:
             handlers.append((r'/tiles_info', TilesInfoHandler))
-        if self.debug:
-            handlers.append((r'/test/echo', EchoHandler))
-            handlers.append((r'/test/ping', PingHandler))
+
         run(host="127.0.0.1", port=self.scene.port, more_handlers=handlers)
 
     ## stop method

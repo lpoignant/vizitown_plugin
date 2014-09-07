@@ -32,7 +32,6 @@ sys.path.pop(0)
 
 import core
 
-from vt_utils_converter import PostgisToJSON
 from vt_as_sync import SyncManager
 from vt_utils_result_vttiler import ResultVTTiler
 
@@ -92,7 +91,6 @@ class DataHandler(WebSocketHandler):
         self.logger = logging.getLogger('Vizitown')
         self.scene = core.Scene.instance()
         self.logger.info("WebSocket data opened")
-        self.translator = PostgisToJSON()
 
     ## messageReceived method
     #  Method call when a message is received
@@ -120,7 +118,7 @@ class DataHandler(WebSocketHandler):
 
         tile = core.Tile(**dictionary)
         provider_manager = self.scene.providerManager
-        tiles = provider_manager.request_tile(tile)
+        tiles = provider_manager.request_tile(tile, uuid)
 
         for tile in tiles:
             for part in tile:

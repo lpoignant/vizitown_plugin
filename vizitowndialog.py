@@ -36,7 +36,6 @@ import vectors
 
 from vt_as_app import AppServer
 from vt_as_sync import SyncManager
-from vt_as_provider_manager import ProviderManager
 from vt_utils_provider_factory import ProviderFactory
 
 
@@ -58,7 +57,6 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
         self.zoomLevel = "1"
 
         self.scene = core.Scene.instance()
-        self.providerManager = ProviderManager.instance()
 
     ## init_extent method
     #  Set the default extent
@@ -295,5 +293,4 @@ class VizitownDialog(QtGui.QDialog, Ui_Vizitown):
             self.btn_generate.setText("Generate")
             self.appServerRunning = False
             SyncManager.instance().remove_all_listener()
-            self.providerManager.clear()
             self.scene.clear()

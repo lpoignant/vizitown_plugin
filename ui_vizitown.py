@@ -17,11 +17,14 @@ except AttributeError:
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
+
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
+
 
 class Ui_Vizitown(object):
     def setupUi(self, Vizitown):
@@ -219,4 +222,3 @@ class Ui_Vizitown(object):
         self.label_13.setText(_translate("Vizitown", "Xmax", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.extent), _translate("Vizitown", "Extent", None))
         self.btn_generate.setText(_translate("Vizitown", "Generate", None))
-

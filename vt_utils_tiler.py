@@ -22,6 +22,7 @@
 import math
 import time
 import numpy
+import logging
 try:
     from osgeo import gdal
 except:
@@ -30,8 +31,6 @@ from gdalconst import *
 from multiprocessing import Queue
 import os
 import sys
-
-import core
 
 
 ## Class Extent
@@ -78,6 +77,7 @@ class Raster(object):
         self.isDem = isDem
         self.path = path
         self.dem = None
+        self.logger = logging.getLogger('Vizitown')
 
     ## rasterName method
     #  Format the name of the raster like this : nameWithoutExtension_zoomLevel_tileX_tileY
@@ -242,7 +242,7 @@ class Raster(object):
 
         fileName = os.path.splitext(os.path.basename(self.path))[0] + "_" + str(tileSize) + "_" + str(zoom)
         destPath = os.path.join(baseDestPath, fileName)
-        core.Logger.instance().info("Destination folder : " + destPath)
+        self.logger.info("Destination folder : " + destPath)
         if not os.path.isdir(destPath):
             os.makedirs(destPath)
 
@@ -260,7 +260,7 @@ class Raster(object):
                 while tileMinX < maxX:
                     tileMaxX = tileMinX + size
                     outFilename = self.rasterName(destPath, zoom, x, y)
-                    core.Logger.instance().info("Create tile : " + outFilename)
+                    self.logger.info("Create tile : " + outFilename)
                     self.createForExtent(Extent(tileMinX, tileMinY, tileMaxX, tileMaxY), outFilename)
                     #Next x tile
                     x += 1
@@ -289,6 +289,7 @@ class VTTiler(object):
         self.ortho = ortho
         self.RDem = None
         self.ROrtho = None
+        self.logger = logging.getLogger('Vizitown')
 
     ## create method
     #  Produce the tile for the data exists
@@ -326,7 +327,7 @@ class VTTiler(object):
 
             queue.put([self.ROrtho.pixelSizeX()])
 
-        core.Logger.instance().info("GDAL Tiling is over.")
+        self.logger.info("GDAL Tiling is over.")
         # Close log files
         sys.stderr.close()
         sys.stdout.close()

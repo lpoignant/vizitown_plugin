@@ -27,7 +27,6 @@ import multiprocessing as mp
 import core
 
 from vt_utils_tiler import VTTiler, Extent
-from vt_as_provider_manager import ProviderManager
 from vt_as_provider_raster import RasterProvider
 
 
@@ -37,8 +36,8 @@ class ProviderFactory():
 
     ## Constructor
     def __init__(self):
-        self.providerManager = ProviderManager.instance()
         self.scene = core.Scene.instance()
+        self.providerManager = self.scene.providerManager
 
     ## create_raster_providers method
     #  Create all providers for DEM and raster
