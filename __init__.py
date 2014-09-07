@@ -24,6 +24,7 @@ import logging
 import sys
 import os
 
+from logging import handlers
 ## classFactory load Vizitown class from file Vizitown
 def classFactory(iface):
     logger = logging.getLogger('Vizitown')
@@ -32,7 +33,8 @@ def classFactory(iface):
     # Define file with entire path 
     loggerPath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "vizitown.log")
 
-    fh = logging.FileHandler(loggerPath)
+    fh = logging.handlers.RotatingFileHandler(loggerPath, mode='a', maxBytes=5000, backupCount=5)
+    
     fh.setLevel(logging.DEBUG)
 
     format = '%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s'
@@ -41,6 +43,9 @@ def classFactory(iface):
     fh.setFormatter(formatter)
 
     logger.addHandler(fh)
+
+    sys.stderr = open(os.path.join(os.path.dirname(__file__), "log.err"), "w", 0)
+    sys.stdout = open(os.path.join(os.path.dirname(__file__), "log.out"), "w", 0)
 
     from vizitown import Vizitown
     return Vizitown(iface)
