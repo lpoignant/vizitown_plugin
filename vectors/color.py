@@ -79,6 +79,9 @@ class Color:
 
         for feature in feature_array:
             for i in range(nbColor):
+                # print feature
+                if not self.DATA in feature.keys():
+                    break
                 data = feature[self.DATA]
 
                 if (data >= self._colors[i][self.MIN] and
@@ -98,7 +101,10 @@ class Color:
 
         for feature in feature_array:
             for i in range(nbColor):
-                if str(feature[self.DATA]) == str(self._colors[i][self.VALUE]):
+                # print feature
+                if not self.DATA in feature.keys():
+                    break
+                if (feature[self.DATA]).encode('utf-8') == (self._colors[i][self.VALUE]).encode('utf-8'):
                     del feature[self.DATA]
                     array[i].append(feature)
                     break
